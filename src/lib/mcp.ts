@@ -17,10 +17,6 @@ export async function getMcpClient() {
   mcpClient = new Client({
     name: "kapruka-agent",
     version: "1.0.0"
-  }, {
-    capabilities: {
-      tools: {}
-    }
   });
 
   await mcpClient.connect(transport);
