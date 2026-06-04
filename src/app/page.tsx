@@ -28,9 +28,7 @@ const SUGGESTIONS = [
 ];
 
 export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit, setInput, isLoading } = useChat({
-    maxSteps: 5,
-  });
+  const { messages, input, handleInputChange, handleSubmit, setInput, isLoading } = useChat({});
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
 

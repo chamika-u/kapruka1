@@ -1,4 +1,4 @@
-import { streamText, jsonSchema } from "ai";
+import { streamText, jsonSchema, stepCountIs } from "ai";
 import { google } from "@ai-sdk/google";
 import { getMcpClient } from "@/lib/mcp";
 import type { Tool } from "ai";
@@ -52,10 +52,10 @@ Guidelines:
       system: systemPrompt,
       messages,
       tools: aiTools,
-      maxSteps: 5, // Allow the model to call tools and observe results multiple times
+      stopWhen: stepCountIs(5), // Allow the model to call tools and observe results multiple times
     });
 
-    return result.toDataStreamResponse();
+    return result.toUIMessageStreamResponse();
   } catch (error) {
     console.error("Chat API Error:", error);
     return new Response(
