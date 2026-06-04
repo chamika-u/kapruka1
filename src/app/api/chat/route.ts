@@ -1,7 +1,7 @@
-import { streamText, tool } from "ai";
+import { streamText, jsonSchema } from "ai";
 import { google } from "@ai-sdk/google";
 import { getMcpClient } from "@/lib/mcp";
-import { z } from "zod";
+import type { Tool } from "ai";
 
 export const maxDuration = 60; // Allow long executions for multi-step AI
 
@@ -10,28 +10,30 @@ export async function POST(req: Request) {
     const { messages } = await req.json();
     const mcp = await getMcpClient();
     const mcpToolsResult = await mcp.listTools();
-    
-    const aiTools: Record<string, any> = {};
 
-    // Dynamically map MCP tools to Vercel AI SDK tools
+    const aiTools: Record<string, Tool<any, any>> = {};
+
+    // Dynamically map MCP tools to Vercel AI SDK v6 tools
     for (const t of mcpToolsResult.tools) {
-      aiTools[t.name] = tool({
-        description: t.description ? `${t.description}\n\nIMPORTANT JSON SCHEMA for arguments: ${JSON.stringify(t.inputSchema)}` : `Tool: ${t.name}`,
-        parameters: z.record(z.string(), z.any()), // Accept any object, we rely on the LLM to follow the JSON schema in the description
-        execute: async (args) => {
+      aiTools[t.name] = {
+        description: t.description
+          ? `${t.description}\n\nIMPORTANT JSON SCHEMA for arguments: ${JSON.stringify(t.inputSchema)}`
+          : `Tool: ${t.name}`,
+        inputSchema: jsonSchema(t.inputSchema as any),
+        execute: async (args: Record<string, unknown>) => {
           try {
             console.log(`Executing MCP tool: ${t.name} with args:`, args);
             const result = await mcp.callTool({
               name: t.name,
-              arguments: args
+              arguments: args,
             });
             return result.content;
           } catch (e: any) {
             console.error(`Error executing ${t.name}:`, e);
             return { error: e.message || "Failed to execute tool" };
           }
-        }
-      });
+        },
+      };
     }
 
     const systemPrompt = `You are a helpful, witty, and warm AI shopping assistant for Kapruka (Sri Lanka's premier e-commerce platform).
@@ -56,6 +58,9 @@ Guidelines:
     return result.toDataStreamResponse();
   } catch (error) {
     console.error("Chat API Error:", error);
-    return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500, headers: { "Content-Type": "application/json" } });
+    return new Response(
+      JSON.stringify({ error: "Internal Server Error" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 }
