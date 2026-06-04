@@ -69,6 +69,10 @@ const translations: Record<Locale, Record<string, string>> = {
 
     // General
     "general.lkr": "LKR",
+
+    // Errors
+    "error.rateLimit": "Rate limit reached — please wait a moment and try again.",
+    "error.generic": "Something went wrong. Please try again.",
   },
   si: {
     // Header
@@ -133,6 +137,10 @@ const translations: Record<Locale, Record<string, string>> = {
 
     // General
     "general.lkr": "රු.",
+
+    // Errors
+    "error.rateLimit": "ඉල්ලීම් සීමාවට ළඟා විය — මොහොතක් රැඳී නැවත උත්සාහ කරන්න.",
+    "error.generic": "යම් දෝෂයක් ඇති විය. කරුණාකර නැවත උත්සාහ කරන්න.",
   },
 };
 
