@@ -27,6 +27,7 @@ export async function POST(req: Request) {
               name: t.name,
               arguments: args,
             });
+            console.log(`Tool Result for ${t.name}:`, JSON.stringify(result.content, null, 2));
             return result.content;
           } catch (e: any) {
             console.error(`Error executing ${t.name}:`, e);
