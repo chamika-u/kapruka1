@@ -1,0 +1,196 @@
+# Kapruka AI Shopping Agent — Phase 1 Documentation
+> Project Codename: **Kapruka Agent Challenge 2026**  
+> Date: June 5, 2026  
+> Author: Kapruka AI Team  
+
+---
+
+## 1. Overview
+
+Phase 1 establishes the foundational architecture for the Kapruka AI Shopping Agent — a full-screen, conversational commerce experience built on top of the Kapruka MCP (Model Context Protocol). The goal is to create an immersive, Apple-inspired interface that feels native, premium, and delightful to use.
+
+---
+
+## 2. Tech Stack
+
+| Layer          | Technology                          | Purpose                                       |
+|----------------|-------------------------------------|-----------------------------------------------|
+| Framework      | Next.js (App Router)                | Full-stack React framework with SSR support   |
+| Language       | TypeScript                          | Type safety across the entire codebase        |
+| Styling        | Vanilla CSS (CSS Modules)           | Apple HIG-inspired design system              |
+| AI SDK         | Vercel AI SDK (`ai`, `@ai-sdk/google`) | Streaming chat with tool-calling support     |
+| MCP Client     | `@modelcontextprotocol/sdk`         | Connect to Kapruka's remote MCP endpoint      |
+| Icons          | Lucide React                        | Clean, consistent iconography                 |
+| Font           | Inter (via Google Fonts)            | Closest web equivalent to Apple's SF Pro      |
+
+---
+
+## 3. Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│                  Browser                     │
+│  ┌───────────────────────────────────────┐   │
+│  │        Next.js App (page.tsx)         │   │
+│  │  ┌─────────┐  ┌──────────────────┐   │   │
+│  │  │  Chat   │  │  ProductCarousel  │   │   │
+│  │  │  UI     │  │  Component        │   │   │
+│  │  └────┬────┘  └──────────────────┘   │   │
+│  │       │  useChat()                    │   │
+│  └───────┼───────────────────────────────┘   │
+│          │  POST /api/chat                   │
+├──────────┼───────────────────────────────────┤
+│          ▼                                   │
+│  ┌───────────────────────────────────────┐   │
+│  │     API Route (route.ts)              │   │
+│  │  ┌────────────┐  ┌────────────────┐   │   │
+│  │  │ Vercel AI  │  │   MCP Client   │   │   │
+│  │  │ streamText │◄─┤  (mcp.ts)      │   │   │
+│  │  └────────────┘  └───────┬────────┘   │   │
+│  └──────────────────────────┼────────────┘   │
+│                             │ stdio          │
+│                    npx mcp-remote            │
+│                             │                │
+├─────────────────────────────┼────────────────┤
+│                             ▼                │
+│         https://mcp.kapruka.com/mcp          │
+│         (Live Kapruka MCP Server)            │
+└──────────────────────────────────────────────┘
+```
+
+---
+
+## 4. File Structure
+
+```
+e:\kapruka\
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── chat/
+│   │   │       └── route.ts        # AI chat endpoint + MCP tool mapping
+│   │   ├── globals.css             # Apple-inspired design system
+│   │   ├── layout.tsx              # Root layout (Inter font, metadata)
+│   │   ├── page.module.css         # Chat page styles (iMessage-style)
+│   │   └── page.tsx                # Main chat UI component
+│   ├── components/
+│   │   ├── ProductCard.module.css  # Apple Store-inspired product cards
+│   │   └── ProductCard.tsx         # ProductCard + ProductCarousel
+│   └── lib/
+│       └── mcp.ts                  # MCP client singleton
+├── docs/
+│   └── phase-1.docs                # This file
+├── postcss.config.mjs
+├── next.config.ts
+├── tsconfig.json
+└── package.json
+```
+
+---
+
+## 5. Design Decisions
+
+### 5.1 Apple-Inspired UI/UX
+
+The entire interface follows Apple's Human Interface Guidelines:
+
+- **Typography**: Inter font family, mimicking SF Pro's proportions and weight distribution.
+- **Colours**: Clean whites (`#ffffff`, `#f5f5f7`), system blue (`#0071e3`), Kapruka accent orange (`#ff6723`).
+- **Message Bubbles**: iMessage-style — blue for the user, white with subtle borders for the assistant.
+- **Send Button**: Circular blue with an ArrowUp icon (identical to Apple Messages).
+- **Vibrancy / Materials**: Frosted-glass navigation and input bars using `backdrop-filter: saturate(180%) blur(20px)`.
+- **Motion**: Apple's signature spring curves (`cubic-bezier(0.22, 1, 0.36, 1)`) on all interactive elements.
+- **Shadows**: Layered, diffuse shadows that create depth without heaviness.
+
+### 5.2 MCP Integration Strategy
+
+Rather than hardcoding tool definitions, we dynamically fetch all available tools from the Kapruka MCP at request time using `mcp.listTools()`. This ensures forward compatibility — if Kapruka adds new tools to their MCP, our agent automatically gains access without code changes.
+
+### 5.3 Conversational AI
+
+The system prompt instructs the model to:
+- Maintain a warm, witty, premium personality
+- Support Sinhala and Tanglish natively
+- Keep responses concise and visually structured
+- Guide users from discovery to checkout seamlessly
+
+---
+
+## 6. Key Components
+
+### 6.1 `getMcpClient()` — MCP Connection Manager
+- Singleton pattern to avoid reconnecting on every API call
+- Uses `StdioClientTransport` → `npx mcp-remote` for secure, authenticated tunnelling
+- Location: `src/lib/mcp.ts`
+
+### 6.2 `POST /api/chat` — Chat Endpoint
+- Fetches all MCP tools dynamically
+- Maps each tool to Vercel AI SDK format using `z.record(z.any())` for flexible parameter passing
+- Streams responses via `streamText` with `maxSteps: 5` for multi-turn tool use
+- Location: `src/app/api/chat/route.ts`
+
+### 6.3 `Chat` — Main Page Component
+- Uses Vercel AI SDK's `useChat` hook for real-time streaming
+- Welcome screen with suggestion chips for first-time users
+- Auto-scrolling message container
+- Rich tool result rendering (ProductCarousel injection)
+- Location: `src/app/page.tsx`
+
+### 6.4 `ProductCard` / `ProductCarousel`
+- Apple Store-inspired cards with hover lift effects and spring animations
+- Horizontal scroll carousel with snap alignment
+- Location: `src/components/ProductCard.tsx`
+
+---
+
+## 7. Environment Variables
+
+| Variable                        | Required | Description                                  |
+|---------------------------------|----------|----------------------------------------------|
+| `GOOGLE_GENERATIVE_AI_API_KEY`  | Yes      | Gemini API key for the conversational model  |
+
+Create a `.env.local` file in the project root:
+```env
+GOOGLE_GENERATIVE_AI_API_KEY=your_key_here
+```
+
+---
+
+## 8. Running Locally
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Open in browser
+# → http://localhost:3000
+```
+
+---
+
+## 9. Phase 1 Deliverables Checklist
+
+- [x] Next.js project initialization
+- [x] Vanilla CSS design system (Apple-inspired)
+- [x] MCP client connection to `mcp.kapruka.com`
+- [x] Dynamic tool mapping (MCP → Vercel AI SDK)
+- [x] Full-screen iMessage-style chat interface
+- [x] ProductCard & ProductCarousel components
+- [x] System prompt with personality + Sinhala/Tanglish support
+- [x] Welcome screen with suggestion chips
+- [x] Responsive design (mobile + desktop)
+
+---
+
+## 10. Next Steps (Phase 2)
+
+- [ ] Multi-item cart management with persistent state
+- [ ] Delivery date picker UI component
+- [ ] Gift messaging flow
+- [ ] Complete checkout integration with payment link generation
+- [ ] Deployment to Vercel / public URL
+- [ ] Dark mode toggle (Apple-style automatic + manual)
+- [ ] Sinhala language UI labels and RTL considerations
