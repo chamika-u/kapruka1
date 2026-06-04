@@ -108,6 +108,10 @@
   letter-spacing: -0.01em;
   transition: all var(--duration-fast) var(--ease-apple);
   box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
 }
 
 .button:hover {
@@ -119,6 +123,18 @@
 .button:active {
   background: var(--tint-active);
   transform: scale(0.97);
+}
+
+.buttonInCart {
+  background: var(--system-green);
+}
+
+.buttonInCart:hover {
+  background: #2db84e;
+}
+
+.buttonAdded {
+  animation: popIn var(--duration-normal) var(--spring) forwards;
 }
 
 /* ── Responsive ── */
