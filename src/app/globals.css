@@ -1,52 +1,98 @@
-/* src/app/globals.css */
+/* ============================================================
+   Kapruka AI — Apple-Inspired Design System
+   Clean, minimal, premium. Inspired by Apple HIG.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --background: #0f172a;
-  --foreground: #f8fafc;
-  
-  --primary: #f97316; /* Vibrant Orange */
-  --primary-hover: #ea580c;
-  --primary-foreground: #ffffff;
-  
-  --surface: rgba(30, 41, 59, 0.7);
-  --surface-border: rgba(255, 255, 255, 0.1);
-  --surface-hover: rgba(30, 41, 59, 0.9);
-  
-  --input-bg: rgba(15, 23, 42, 0.6);
-  --input-border: rgba(255, 255, 255, 0.2);
-  
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  /* ── Colour Palette (Light — Apple style) ── */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f7;
+  --bg-tertiary: #e8e8ed;
+  --bg-grouped: #f2f2f7;
+
+  --label-primary: #1d1d1f;
+  --label-secondary: #6e6e73;
+  --label-tertiary: #aeaeb2;
+
+  --separator: rgba(60, 60, 67, 0.12);
+  --separator-opaque: #c6c6c8;
+
+  /* Apple system blue */
+  --tint: #0071e3;
+  --tint-hover: #0077ed;
+  --tint-active: #006edb;
+
+  /* Kapruka accent — warm orange for brand identity */
+  --accent: #ff6723;
+  --accent-hover: #e85a1b;
+  --accent-soft: rgba(255, 103, 35, 0.1);
+
+  --system-green: #34c759;
+  --system-red: #ff3b30;
+
+  /* ── Surfaces & Materials ── */
+  --material-thin: rgba(255, 255, 255, 0.72);
+  --material-regular: rgba(255, 255, 255, 0.85);
+  --material-thick: rgba(255, 255, 255, 0.92);
+
+  /* ── Radii (Apple uses generous, consistent rounding) ── */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
   --radius-full: 9999px;
 
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* ── Shadows (layered, diffuse — Apple style) ── */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.1), 0 8px 20px rgba(0, 0, 0, 0.06);
+
+  /* ── Motion ── */
+  --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --spring: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 0.18s;
+  --duration-normal: 0.3s;
+  --duration-slow: 0.5s;
 }
 
-* {
+/* ── Reset ── */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-  line-height: 1.5;
+  background-color: var(--bg-secondary);
+  color: var(--label-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.47059;
+  letter-spacing: -0.022em;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Full-screen app */
-  background-image: radial-gradient(circle at top right, rgba(249, 115, 22, 0.1) 0%, transparent 40%),
-                    radial-gradient(circle at bottom left, rgba(249, 115, 22, 0.05) 0%, transparent 40%);
+  overflow: hidden;
 }
 
 a {
-  color: inherit;
+  color: var(--tint);
   text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 button {
@@ -54,47 +100,87 @@ button {
   border: none;
   background: transparent;
   font-family: inherit;
+  font-size: inherit;
 }
 
-/* Glassmorphism Utilities */
-.glass {
-  background: var(--surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--surface-border);
+/* ── Apple-style Material (Vibrancy/Frosted Glass) ── */
+.material {
+  background: var(--material-regular);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
 }
 
-.glass-card {
-  background: var(--surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--surface-border);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+.material-thin {
+  background: var(--material-thin);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+/* ── Animations ── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {
-  animation: fadeIn var(--transition-normal) forwards;
+  animation: fadeInUp var(--duration-normal) var(--spring) forwards;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
+.animate-scale-in {
+  animation: scaleIn var(--duration-normal) var(--spring) forwards;
 }
+
+/* ── Scrollbar (minimal, macOS-inspired) ── */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: var(--radius-full);
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.25);
+  background-clip: content-box;
+}
+
+/* ── Selection ── */
+::selection {
+  background: rgba(0, 113, 227, 0.2);
+  color: var(--label-primary);
 }
