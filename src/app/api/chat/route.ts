@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     for (const t of mcpToolsResult.tools) {
       aiTools[t.name] = tool({
         description: t.description ? `${t.description}\n\nIMPORTANT JSON SCHEMA for arguments: ${JSON.stringify(t.inputSchema)}` : `Tool: ${t.name}`,
-        parameters: z.record(z.any()), // Accept any object, we rely on the LLM to follow the JSON schema in the description
+        parameters: z.record(z.string(), z.any()), // Accept any object, we rely on the LLM to follow the JSON schema in the description
         execute: async (args) => {
           try {
             console.log(`Executing MCP tool: ${t.name} with args:`, args);
