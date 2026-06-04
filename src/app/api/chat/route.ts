@@ -102,13 +102,39 @@ Users may mix languages (e.g., "මට birthday cake එකක් ඕන" or "ca
       messages: modelMessages,
       tools: aiTools,
       stopWhen: stepCountIs(5), // Allow the model to call tools and observe results multiple times
+      maxRetries: 2, // Reduce retries to avoid hammering the API on rate limits
     });
 
     return result.toUIMessageStreamResponse();
-  } catch (error) {
+  } catch (error: any) {
     console.error("Chat API Error:", error);
+
+    // Handle rate limit (429) errors gracefully
+    const statusCode = error?.statusCode || error?.lastError?.statusCode || error?.data?.error?.code;
+    const isRateLimit = statusCode === 429 || error?.reason === "maxRetriesExceeded";
+
+    if (isRateLimit) {
+      // Extract retry delay from error message if available
+      const retryMatch = error?.message?.match(/retry in ([\d.]+)s/i);
+      const retryAfter = retryMatch ? Math.ceil(parseFloat(retryMatch[1])) : 60;
+
+      return new Response(
+        JSON.stringify({
+          error: `Rate limit reached. The free-tier Gemini API allows 20 requests/minute. Please wait ${retryAfter} seconds and try again.`,
+          retryAfter,
+        }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Retry-After": String(retryAfter),
+          },
+        }
+      );
+    }
+
     return new Response(
-      JSON.stringify({ error: "Internal Server Error" }),
+      JSON.stringify({ error: "Something went wrong. Please try again." }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
