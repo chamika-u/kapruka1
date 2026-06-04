@@ -2,8 +2,11 @@
 
 import { useChat } from "@ai-sdk/react";
 import { useState, useEffect, useRef, FormEvent } from "react";
-import { ArrowUp, ShoppingBag } from "lucide-react";
+import { ArrowUp, ShoppingBag, Globe } from "lucide-react";
 import { ProductCarousel } from "@/components/ProductCard";
+import { CartDrawer } from "@/components/CartDrawer";
+import { useCart, CartItem } from "@/lib/CartContext";
+import { useI18n } from "@/lib/i18n";
 import styles from "./page.module.css";
 
 // Helper to safely extract products from a tool result (parses Kapruka Markdown)
@@ -53,19 +56,27 @@ const extractProducts = (result: any) => {
   return null;
 };
 
-const SUGGESTIONS = [
-  "🎂 Birthday cakes",
-  "🌺 Flowers for Mom",
-  "🎁 Gift hampers",
-  "🍫 Chocolate boxes",
-];
-
 export default function Chat() {
   const { messages, sendMessage, status } = useChat();
   const [input, setInput] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [cartOpen, setCartOpen] = useState(false);
+  const { cartCount, cart } = useCart();
+  const { t, locale, setLocale } = useI18n();
 
   const isLoading = status === "streaming" || status === "submitted";
+
+  const SUGGESTIONS = [
+    t("suggestions.cakes"),
+    t("suggestions.flowers"),
+    t("suggestions.gifts"),
+    t("suggestions.chocolate"),
+  ];
+
+  // Set data-locale on body for CSS font switching
+  useEffect(() => {
+    document.body.setAttribute("data-locale", locale);
+  }, [locale]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -86,13 +97,48 @@ export default function Chat() {
     sendMessage({ text });
   };
 
+  const handleCheckout = (items: CartItem[]) => {
+    // Serialize cart items and send to AI for checkout
+    const itemsSummary = items.map((item) => {
+      let desc = `- ${item.name} (ID: ${item.id}), Qty: ${item.quantity}, Price: LKR ${item.price}`;
+      if (item.giftMessage) desc += `, Gift Message: "${item.giftMessage}"`;
+      if (item.deliveryDate) desc += `, Delivery Date: ${item.deliveryDate}`;
+      return desc;
+    }).join("\n");
+
+    const checkoutMsg = `Please help me checkout with these items:\n${itemsSummary}\n\nPlease create a cart and generate a guest checkout link for me.`;
+    sendMessage({ text: checkoutMsg });
+  };
+
+  const toggleLocale = () => {
+    setLocale(locale === "en" ? "si" : "en");
+  };
+
   return (
     <main className={styles.main}>
       {/* ── Apple-style Navigation Bar ── */}
       <header className={styles.header}>
+        <div className={styles.headerLeft}>
+          <button className={styles.langToggle} onClick={toggleLocale} aria-label="Toggle language">
+            <Globe size={16} />
+            <span>{t("header.langSwitch")}</span>
+          </button>
+        </div>
         <div className={styles.logo}>
           <ShoppingBag size={22} className={styles.logoIcon} />
-          <span>Kapruka</span>
+          <span>{t("header.brand")}</span>
+        </div>
+        <div className={styles.headerRight}>
+          <button
+            className={styles.cartButton}
+            onClick={() => setCartOpen(true)}
+            aria-label="Open cart"
+          >
+            <ShoppingBag size={20} />
+            {cartCount > 0 && (
+              <span className={styles.cartBadge}>{cartCount}</span>
+            )}
+          </button>
         </div>
       </header>
 
@@ -104,10 +150,10 @@ export default function Chat() {
               <ShoppingBag size={36} />
             </div>
             <h1 className={styles.welcomeTitle}>
-              Ayubowan! 👋
+              {t("welcome.title")}
             </h1>
             <p className={styles.welcomeSubtitle}>
-              I&apos;m your Kapruka shopping assistant. Tell me what you&apos;re looking for and I&apos;ll help you find it.
+              {t("welcome.subtitle")}
             </p>
             <div className={styles.suggestionsGrid}>
               {SUGGESTIONS.map((s) => (
@@ -190,7 +236,7 @@ export default function Chat() {
           <input
             className={styles.inputField}
             value={input}
-            placeholder="Message Kapruka…"
+            placeholder={t("input.placeholder")}
             onChange={(e) => setInput(e.target.value)}
             disabled={isLoading}
           />
@@ -204,6 +250,13 @@ export default function Chat() {
           <ArrowUp size={20} strokeWidth={2.5} />
         </button>
       </form>
+
+      {/* ── Cart Drawer ── */}
+      <CartDrawer
+        isOpen={cartOpen}
+        onClose={() => setCartOpen(false)}
+        onCheckout={handleCheckout}
+      />
     </main>
   );
 }

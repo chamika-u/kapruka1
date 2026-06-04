@@ -12,17 +12,28 @@
 
 /* ── Navigation Bar (Apple-style top bar) ── */
 .header {
-  padding: 0 24px;
+  padding: 0 16px;
   height: 52px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   position: relative;
   border-bottom: 0.5px solid var(--separator);
   background: var(--material-thick);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   z-index: 10;
+}
+
+.headerLeft,
+.headerRight {
+  display: flex;
+  align-items: center;
+  min-width: 72px;
+}
+
+.headerRight {
+  justify-content: flex-end;
 }
 
 .logo {
@@ -33,10 +44,71 @@
   align-items: center;
   gap: 8px;
   letter-spacing: -0.01em;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .logoIcon {
   color: var(--accent);
+}
+
+/* ── Language Toggle ── */
+.langToggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--label-secondary);
+  transition: all var(--duration-fast) var(--ease-apple);
+  border: 0.5px solid var(--separator);
+  background: var(--bg-primary);
+}
+
+.langToggle:hover {
+  background: var(--tint);
+  color: white;
+  border-color: var(--tint);
+}
+
+/* ── Cart Button ── */
+.cartButton {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--label-primary);
+  transition: all var(--duration-fast) var(--ease-apple);
+}
+
+.cartButton:hover {
+  background: var(--bg-grouped);
+}
+
+.cartBadge {
+  position: absolute;
+  top: 2px;
+  right: 0px;
+  min-width: 18px;
+  height: 18px;
+  background: var(--accent);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+  animation: popIn var(--duration-fast) var(--spring) forwards;
+  box-shadow: 0 1px 4px rgba(255, 103, 35, 0.4);
 }
 
 /* ── Chat Messages Area ── */
@@ -314,5 +386,13 @@
 
   .welcomeSubtitle {
     font-size: 15px;
+  }
+
+  .langToggle span {
+    display: none;
+  }
+
+  .langToggle {
+    padding: 6px 8px;
   }
 }
