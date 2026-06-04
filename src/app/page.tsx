@@ -118,16 +118,15 @@ export default function Chat() {
               .filter((part) => part.type === "tool-invocation")
               .map((part) => {
                 if (part.type !== "tool-invocation") return null;
-                const toolInvocation = part.toolInvocation;
-                const hasResult = toolInvocation.state === "result";
-                const resultData = hasResult ? toolInvocation.result : null;
+                const hasResult = part.state === "result";
+                const resultData = hasResult ? part.result : null;
                 const products = hasResult ? extractProducts(resultData) : null;
 
                 return (
-                  <div key={toolInvocation.toolCallId}>
+                  <div key={part.toolCallId}>
                     <div className={styles.toolBlock}>
                       {hasResult ? "✓" : "⏳"}{" "}
-                      <strong>{toolInvocation.toolName}</strong>
+                      <strong>{part.toolName}</strong>
                       {!hasResult && " — working…"}
                     </div>
                     {products && products.length > 0 && (
