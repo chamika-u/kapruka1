@@ -1,0 +1,374 @@
+/* ============================================================
+   Cart Drawer — Apple-inspired slide-out panel
+   ============================================================ */
+
+/* ── Overlay ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
+  animation: overlayIn var(--duration-fast) var(--ease-apple) forwards;
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Drawer Panel ── */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  max-width: 92vw;
+  height: 100vh;
+  background: var(--bg-secondary);
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.12);
+  animation: drawerSlideIn var(--duration-normal) var(--spring) forwards;
+}
+
+@keyframes drawerSlideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* ── Header ── */
+.drawerHeader {
+  padding: 20px 20px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 0.5px solid var(--separator);
+  background: var(--material-thick);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+.drawerTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--label-primary);
+  letter-spacing: -0.03em;
+}
+
+.drawerBadge {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--label-secondary);
+  background: var(--bg-grouped);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  margin-left: 8px;
+}
+
+.closeButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--label-secondary);
+  transition: all var(--duration-fast) var(--ease-apple);
+}
+
+.closeButton:hover {
+  background: var(--separator-opaque);
+  color: var(--label-primary);
+}
+
+/* ── Items List ── */
+.itemsList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+/* ── Cart Item ── */
+.cartItem {
+  display: flex;
+  gap: 14px;
+  padding: 16px 20px;
+  border-bottom: 0.5px solid var(--separator);
+  animation: fadeInUp var(--duration-fast) var(--spring) forwards;
+  position: relative;
+}
+
+.itemImage {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  background: var(--bg-grouped);
+  flex-shrink: 0;
+}
+
+.itemImagePlaceholder {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--bg-grouped), var(--bg-tertiary));
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--label-tertiary);
+}
+
+.itemDetails {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.itemName {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--label-primary);
+  line-height: 1.27;
+  letter-spacing: -0.01em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.itemPrice {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+}
+
+.itemActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+/* ── Quantity Stepper ── */
+.quantityStepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--bg-grouped);
+  border-radius: var(--radius-full);
+  border: 0.5px solid var(--separator);
+  overflow: hidden;
+}
+
+.stepperBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--tint);
+  transition: all var(--duration-fast) var(--ease-apple);
+}
+
+.stepperBtn:hover {
+  background: rgba(0, 113, 227, 0.08);
+}
+
+.stepperBtn:active {
+  background: rgba(0, 113, 227, 0.15);
+}
+
+.stepperCount {
+  min-width: 28px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--label-primary);
+  padding: 0 2px;
+}
+
+/* ── Remove Button ── */
+.removeBtn {
+  font-size: 13px;
+  color: var(--system-red);
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
+  transition: all var(--duration-fast) var(--ease-apple);
+}
+
+.removeBtn:hover {
+  background: rgba(255, 59, 48, 0.08);
+}
+
+/* ── Item Badges (gift / delivery) ── */
+.itemBadges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.badgeGift {
+  background: rgba(255, 149, 0, 0.1);
+  color: #e8850a;
+}
+
+.badgeDelivery {
+  background: rgba(52, 199, 89, 0.1);
+  color: #28a745;
+}
+
+/* ── Action Buttons (under each item) ── */
+.itemActionsRow {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.actionBtn {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--tint);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  transition: all var(--duration-fast) var(--ease-apple);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.actionBtn:hover {
+  background: rgba(0, 113, 227, 0.08);
+}
+
+/* ── Empty State ── */
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  gap: 12px;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-grouped);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--label-tertiary);
+  margin-bottom: 4px;
+}
+
+.emptyTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--label-primary);
+  letter-spacing: -0.02em;
+}
+
+.emptySubtitle {
+  font-size: 15px;
+  color: var(--label-secondary);
+  max-width: 260px;
+}
+
+/* ── Footer ── */
+.drawerFooter {
+  padding: 16px 20px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  border-top: 0.5px solid var(--separator);
+  background: var(--material-thick);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.subtotalRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.subtotalLabel {
+  font-size: 15px;
+  color: var(--label-secondary);
+  font-weight: 500;
+}
+
+.subtotalValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--label-primary);
+  letter-spacing: -0.03em;
+}
+
+.checkoutBtn {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-align: center;
+  transition: all var(--duration-fast) var(--ease-apple);
+  box-shadow: 0 4px 16px rgba(255, 103, 35, 0.3);
+}
+
+.checkoutBtn:hover {
+  background: var(--accent-hover);
+  transform: scale(1.01);
+  box-shadow: 0 6px 24px rgba(255, 103, 35, 0.35);
+}
+
+.checkoutBtn:active {
+  transform: scale(0.98);
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .drawer {
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  .cartItem {
+    padding: 12px 16px;
+  }
+
+  .itemImage,
+  .itemImagePlaceholder {
+    width: 60px;
+    height: 60px;
+  }
+}

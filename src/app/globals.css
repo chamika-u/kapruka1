@@ -4,6 +4,7 @@
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@300;400;500;600;700&display=swap');
 
 :root {
   /* ── Colour Palette (Light — Apple style) ── */
@@ -57,6 +58,10 @@
   --duration-fast: 0.18s;
   --duration-normal: 0.3s;
   --duration-slow: 0.5s;
+
+  /* ── Font Stacks ── */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  --font-sinhala: 'Noto Sans Sinhala', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* ── Reset ── */
@@ -74,7 +79,7 @@ html {
 body {
   background-color: var(--bg-secondary);
   color: var(--label-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-primary);
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -84,6 +89,13 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+/* ── Sinhala locale override ── */
+body[data-locale="si"] {
+  font-family: var(--font-sinhala);
+  line-height: 1.6;
+  letter-spacing: -0.01em;
 }
 
 a {
@@ -147,6 +159,20 @@ button {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
