@@ -118,8 +118,8 @@ export default function Chat() {
               .filter((part) => part.type === "tool-invocation")
               .map((part) => {
                 if (part.type !== "tool-invocation") return null;
-                const hasResult = part.state === "result";
-                const resultData = hasResult ? part.result : null;
+                const hasResult = part.state === "output-available";
+                const resultData = hasResult ? part.output : null;
                 const products = hasResult ? extractProducts(resultData) : null;
 
                 return (
