@@ -3,7 +3,22 @@
 import { useChat } from "ai/react";
 import { useEffect, useRef } from "react";
 import { Send, ShoppingBag } from "lucide-react";
+import { ProductCarousel } from "@/components/ProductCard";
 import styles from "./page.module.css";
+
+// Helper to safely extract products from a tool result
+const extractProducts = (result: any) => {
+  if (!result) return null;
+  try {
+    const data = typeof result === "string" ? JSON.parse(result) : result;
+    if (Array.isArray(data)) return data;
+    if (data.products && Array.isArray(data.products)) return data.products;
+    if (data.items && Array.isArray(data.items)) return data.items;
+  } catch (e) {
+    // Not valid JSON or parsing failed
+  }
+  return null;
+};
 
 export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
@@ -56,16 +71,23 @@ export default function Chat() {
             </div>
             
             {/* Display tool invocations if any */}
-            {m.toolInvocations?.map((toolInvocation) => (
-              <div key={toolInvocation.toolCallId} className={styles.toolBlock}>
-                Calling tool: <strong>{toolInvocation.toolName}</strong>...
-                {toolInvocation.state === 'result' && (
-                  <div>
-                    ✓ Done
+            {m.toolInvocations?.map((toolInvocation) => {
+              const hasResult = toolInvocation.state === 'result';
+              const resultData = hasResult ? toolInvocation.result : null;
+              const products = hasResult ? extractProducts(resultData) : null;
+
+              return (
+                <div key={toolInvocation.toolCallId}>
+                  <div className={styles.toolBlock}>
+                    Calling tool: <strong>{toolInvocation.toolName}</strong>... {hasResult && '✓ Done'}
                   </div>
-                )}
-              </div>
-            ))}
+                  {/* Rich Component Injection */}
+                  {products && products.length > 0 && (
+                    <ProductCarousel products={products} />
+                  )}
+                </div>
+              );
+            })}
           </div>
         ))}
 
