@@ -1,4 +1,4 @@
-import { streamText, jsonSchema, stepCountIs } from "ai";
+import { streamText, jsonSchema, stepCountIs, convertToModelMessages } from "ai";
 import { google } from "@ai-sdk/google";
 import { getMcpClient } from "@/lib/mcp";
 import type { Tool } from "ai";
@@ -47,10 +47,12 @@ Guidelines:
 4. When showing products, format them nicely. If you fetch products, summarize the key details (price, name) elegantly.
 5. Emphasize a premium shopping experience.`;
 
+    const modelMessages = await convertToModelMessages(messages, { tools: aiTools });
+
     const result = streamText({
       model: google("gemini-1.5-pro"),
       system: systemPrompt,
-      messages,
+      messages: modelMessages,
       tools: aiTools,
       stopWhen: stepCountIs(5), // Allow the model to call tools and observe results multiple times
     });
