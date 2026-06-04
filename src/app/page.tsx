@@ -2,7 +2,7 @@
 
 import { useChat } from "ai/react";
 import { useEffect, useRef } from "react";
-import { Send, ShoppingBag } from "lucide-react";
+import { ArrowUp, ShoppingBag } from "lucide-react";
 import { ProductCarousel } from "@/components/ProductCard";
 import styles from "./page.module.css";
 
@@ -14,15 +14,22 @@ const extractProducts = (result: any) => {
     if (Array.isArray(data)) return data;
     if (data.products && Array.isArray(data.products)) return data.products;
     if (data.items && Array.isArray(data.items)) return data.items;
-  } catch (e) {
+  } catch {
     // Not valid JSON or parsing failed
   }
   return null;
 };
 
+const SUGGESTIONS = [
+  "🎂 Birthday cakes",
+  "🌺 Flowers for Mom",
+  "🎁 Gift hampers",
+  "🍫 Chocolate boxes",
+];
+
 export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    maxSteps: 5
+  const { messages, input, handleInputChange, handleSubmit, setInput, isLoading } = useChat({
+    maxSteps: 5,
   });
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -34,21 +41,43 @@ export default function Chat() {
     }
   }, [messages, isLoading]);
 
+  const handleSuggestion = (text: string) => {
+    setInput(text);
+  };
+
   return (
     <main className={styles.main}>
+      {/* ── Apple-style Navigation Bar ── */}
       <header className={styles.header}>
         <div className={styles.logo}>
-          <ShoppingBag size={28} />
-          <span>Kapruka AI</span>
+          <ShoppingBag size={22} className={styles.logoIcon} />
+          <span>Kapruka</span>
         </div>
       </header>
 
+      {/* ── Chat Messages ── */}
       <div className={styles.chatContainer} ref={chatContainerRef}>
         {messages.length === 0 && (
-          <div className={`${styles.messageRow} ${styles.messageRowAgent}`}>
-            <div className={`${styles.messageBubble} ${styles.messageBubbleAgent} animate-fade-in`}>
-              Ayubowan! 👋 I'm your Kapruka AI Shopping Assistant. 
-              How can I help you find the perfect gift today?
+          <div className={styles.welcomeContainer}>
+            <div className={styles.welcomeIcon}>
+              <ShoppingBag size={36} />
+            </div>
+            <h1 className={styles.welcomeTitle}>
+              Ayubowan! 👋
+            </h1>
+            <p className={styles.welcomeSubtitle}>
+              I&apos;m your Kapruka shopping assistant. Tell me what you&apos;re looking for and I&apos;ll help you find it.
+            </p>
+            <div className={styles.suggestionsGrid}>
+              {SUGGESTIONS.map((s) => (
+                <button
+                  key={s}
+                  className={styles.suggestionChip}
+                  onClick={() => handleSuggestion(s)}
+                >
+                  {s}
+                </button>
+              ))}
             </div>
           </div>
         )}
@@ -60,28 +89,31 @@ export default function Chat() {
               m.role === "user" ? styles.messageRowUser : styles.messageRowAgent
             }`}
           >
-            <div
-              className={`${styles.messageBubble} ${
-                m.role === "user"
-                  ? styles.messageBubbleUser
-                  : styles.messageBubbleAgent
-              } animate-fade-in`}
-            >
-              {m.content}
-            </div>
-            
-            {/* Display tool invocations if any */}
+            {m.content && (
+              <div
+                className={`${styles.messageBubble} ${
+                  m.role === "user"
+                    ? styles.messageBubbleUser
+                    : styles.messageBubbleAgent
+                } animate-fade-in`}
+              >
+                {m.content}
+              </div>
+            )}
+
+            {/* Display tool invocations */}
             {m.toolInvocations?.map((toolInvocation) => {
-              const hasResult = toolInvocation.state === 'result';
+              const hasResult = toolInvocation.state === "result";
               const resultData = hasResult ? toolInvocation.result : null;
               const products = hasResult ? extractProducts(resultData) : null;
 
               return (
                 <div key={toolInvocation.toolCallId}>
                   <div className={styles.toolBlock}>
-                    Calling tool: <strong>{toolInvocation.toolName}</strong>... {hasResult && '✓ Done'}
+                    {hasResult ? "✓" : "⏳"}{" "}
+                    <strong>{toolInvocation.toolName}</strong>
+                    {!hasResult && " — working…"}
                   </div>
-                  {/* Rich Component Injection */}
                   {products && products.length > 0 && (
                     <ProductCarousel products={products} />
                   )}
@@ -104,16 +136,24 @@ export default function Chat() {
         )}
       </div>
 
+      {/* ── Input Bar ── */}
       <form onSubmit={handleSubmit} className={styles.inputForm}>
-        <input
-          className={styles.inputField}
-          value={input}
-          placeholder="Ask me to find products, e.g., 'Show me some cakes'..."
-          onChange={handleInputChange}
-          disabled={isLoading}
-        />
-        <button type="submit" className={styles.sendButton} disabled={isLoading || !input.trim()}>
-          <Send size={20} />
+        <div className={styles.inputWrapper}>
+          <input
+            className={styles.inputField}
+            value={input}
+            placeholder="Message Kapruka…"
+            onChange={handleInputChange}
+            disabled={isLoading}
+          />
+        </div>
+        <button
+          type="submit"
+          className={styles.sendButton}
+          disabled={isLoading || !input.trim()}
+          aria-label="Send message"
+        >
+          <ArrowUp size={20} strokeWidth={2.5} />
         </button>
       </form>
     </main>
