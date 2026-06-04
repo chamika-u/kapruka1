@@ -1,4 +1,9 @@
-import React from 'react';
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import { Check } from 'lucide-react';
+import { useCart } from '@/lib/CartContext';
+import { useI18n } from '@/lib/i18n';
 import styles from './ProductCard.module.css';
 
 interface Product {
@@ -12,19 +17,60 @@ interface Product {
 }
 
 export const ProductCard = ({ product }: { product: Product }) => {
+  const { addToCart, isInCart } = useCart();
+  const { t } = useI18n();
+  const [justAdded, setJustAdded] = useState(false);
+
+  const inCart = product.id ? isInCart(product.id) : false;
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!product.id || !product.name) return;
+
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price || 0,
+      image: product.image,
+      url: product.url,
+    });
+
+    setJustAdded(true);
+  };
+
+  // Reset "just added" animation after 1.5s
+  useEffect(() => {
+    if (justAdded) {
+      const timer = setTimeout(() => setJustAdded(false), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [justAdded]);
+
   return (
-    <div className={styles.card}>
+    <div className={styles.card} onClick={() => product.url && window.open(product.url, '_blank')}>
       {product.image && (
         <img src={product.image} alt={product.name} className={styles.image} />
       )}
       <div className={styles.content}>
         <h3 className={styles.name}>{product.name || 'Unnamed Product'}</h3>
-        {product.price && <p className={styles.price}>LKR {product.price}</p>}
+        {product.price && <p className={styles.price}>{t("general.lkr")} {product.price}</p>}
         {product.description && (
           <p className={styles.description}>{product.description.substring(0, 80)}...</p>
         )}
       </div>
-      <button className={styles.button}>Add to Cart</button>
+      <button
+        className={`${styles.button} ${inCart ? styles.buttonInCart : ""} ${justAdded ? styles.buttonAdded : ""}`}
+        onClick={handleAddToCart}
+      >
+        {inCart ? (
+          <>
+            <Check size={14} strokeWidth={2.5} />
+            <span>{t("product.inCart")}</span>
+          </>
+        ) : (
+          t("product.addToCart")
+        )}
+      </button>
     </div>
   );
 };
