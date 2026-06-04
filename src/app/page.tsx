@@ -113,20 +113,20 @@ export default function Chat() {
                 </div>
               ))}
 
-            {/* Display tool invocations */}
+            {/* Display tool invocations (dynamic MCP tools) */}
             {m.parts
-              .filter((part) => part.type === "tool-invocation")
-              .map((part) => {
-                if (part.type !== "tool-invocation") return null;
+              .filter((part): part is any => part.type === "dynamic-tool" || part.type.startsWith("tool-"))
+              .map((part: any) => {
                 const hasResult = part.state === "output-available";
                 const resultData = hasResult ? part.output : null;
                 const products = hasResult ? extractProducts(resultData) : null;
+                const toolName = part.toolName || part.type.replace("tool-", "");
 
                 return (
                   <div key={part.toolCallId}>
                     <div className={styles.toolBlock}>
                       {hasResult ? "✓" : "⏳"}{" "}
-                      <strong>{part.toolName}</strong>
+                      <strong>{toolName}</strong>
                       {!hasResult && " — working…"}
                     </div>
                     {products && products.length > 0 && (
