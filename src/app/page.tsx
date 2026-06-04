@@ -1,8 +1,8 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { useState, useEffect, useRef, FormEvent } from "react";
-import { ArrowUp, ShoppingBag, Globe } from "lucide-react";
+import { useState, useEffect, useRef, useCallback, FormEvent } from "react";
+import { ArrowUp, ShoppingBag, Globe, AlertCircle, X } from "lucide-react";
 import { ProductCarousel } from "@/components/ProductCard";
 import { CartDrawer } from "@/components/CartDrawer";
 import { useCart, CartItem } from "@/lib/CartContext";
@@ -57,14 +57,27 @@ const extractProducts = (result: any) => {
 };
 
 export default function Chat() {
-  const { messages, sendMessage, status } = useChat();
+  const { messages, sendMessage, status, error } = useChat();
   const [input, setInput] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [cartOpen, setCartOpen] = useState(false);
+  const [errorDismissed, setErrorDismissed] = useState(false);
   const { cartCount, cart } = useCart();
   const { t, locale, setLocale } = useI18n();
 
   const isLoading = status === "streaming" || status === "submitted";
+
+  // Reset dismiss when a new error appears
+  useEffect(() => {
+    if (error) setErrorDismissed(false);
+  }, [error]);
+
+  // Derive a user-friendly error message
+  const errorMessage = error && !errorDismissed
+    ? (error.message?.includes("429") || error.message?.includes("rate") || error.message?.includes("quota"))
+      ? t("error.rateLimit")
+      : t("error.generic")
+    : null;
 
   const SUGGESTIONS = [
     t("suggestions.cakes"),
@@ -229,6 +242,21 @@ export default function Chat() {
           </div>
         )}
       </div>
+
+      {/* ── Error Banner ── */}
+      {errorMessage && (
+        <div className={styles.errorBanner}>
+          <AlertCircle size={16} />
+          <span>{errorMessage}</span>
+          <button
+            className={styles.errorDismiss}
+            onClick={() => setErrorDismissed(true)}
+            aria-label="Dismiss"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
 
       {/* ── Input Bar ── */}
       <form onSubmit={handleSubmit} className={styles.inputForm}>
