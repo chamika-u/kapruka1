@@ -50,7 +50,7 @@ Guidelines:
     const modelMessages = await convertToModelMessages(messages, { tools: aiTools });
 
     const result = streamText({
-      model: google("gemini-1.5-pro"),
+      model: google("gemini-1.5-pro-latest"),
       system: systemPrompt,
       messages: modelMessages,
       tools: aiTools,
