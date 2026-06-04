@@ -6,16 +6,49 @@ import { ArrowUp, ShoppingBag } from "lucide-react";
 import { ProductCarousel } from "@/components/ProductCard";
 import styles from "./page.module.css";
 
-// Helper to safely extract products from a tool result
+// Helper to safely extract products from a tool result (parses Kapruka Markdown)
 const extractProducts = (result: any) => {
   if (!result) return null;
+  
   try {
-    const data = typeof result === "string" ? JSON.parse(result) : result;
-    if (Array.isArray(data)) return data;
-    if (data.products && Array.isArray(data.products)) return data.products;
-    if (data.items && Array.isArray(data.items)) return data.items;
-  } catch {
-    // Not valid JSON or parsing failed
+    // The MCP returns an array of content parts: [{ type: "text", text: "..." }]
+    let textContent = "";
+    if (Array.isArray(result) && result.length > 0 && result[0].type === "text") {
+      textContent = result[0].text || "";
+    } else if (typeof result === "string") {
+      textContent = result;
+    }
+
+    if (!textContent) return null;
+
+    // Parse Kapruka Markdown format:
+    // **1. Product Name**
+    //    ID: `ID` · LKR Price · ...
+    //    [View product](URL)
+    const products = [];
+    const productBlocks = textContent.split(/\*\*\d+\.\s/g).slice(1); // split by "**1. ", "**2. " etc
+
+    for (const block of productBlocks) {
+      const nameMatch = block.match(/^(.*?)\*\*/);
+      const idMatch = block.match(/ID:\s*`([^`]+)`/);
+      const priceMatch = block.match(/LKR\s*([\d,]+)/);
+      const urlMatch = block.match(/\[(?:View product|Link)\]\(([^)]+)\)/);
+
+      if (nameMatch && idMatch) {
+        products.push({
+          id: idMatch[1].trim(),
+          name: nameMatch[1].trim(),
+          price: priceMatch ? priceMatch[1].trim() : "",
+          url: urlMatch ? urlMatch[1].trim() : "",
+          // Use a placeholder Kapruka image based on ID or leave blank if we can't reliably guess
+          image: urlMatch ? `https://www.kapruka.com/cdn-cgi/image/width=450,quality=95,f=auto/buyonline/items/large/${idMatch[1].trim()}.jpg` : "",
+        });
+      }
+    }
+
+    if (products.length > 0) return products;
+  } catch (e) {
+    console.error("Failed to parse Kapruka markdown:", e);
   }
   return null;
 };
