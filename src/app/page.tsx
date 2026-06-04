@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef, FormEvent } from "react";
 import { ArrowUp, ShoppingBag } from "lucide-react";
 import { ProductCarousel } from "@/components/ProductCard";
 import styles from "./page.module.css";
@@ -28,9 +28,11 @@ const SUGGESTIONS = [
 ];
 
 export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit, setInput, isLoading } = useChat({});
-
+  const { messages, sendMessage, status } = useChat();
+  const [input, setInput] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  const isLoading = status === "streaming" || status === "submitted";
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -39,8 +41,16 @@ export default function Chat() {
     }
   }, [messages, isLoading]);
 
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+    sendMessage({ text: input });
+    setInput("");
+  };
+
   const handleSuggestion = (text: string) => {
-    setInput(text);
+    if (isLoading) return;
+    sendMessage({ text });
   };
 
   return (
@@ -87,37 +97,45 @@ export default function Chat() {
               m.role === "user" ? styles.messageRowUser : styles.messageRowAgent
             }`}
           >
-            {m.content && (
-              <div
-                className={`${styles.messageBubble} ${
-                  m.role === "user"
-                    ? styles.messageBubbleUser
-                    : styles.messageBubbleAgent
-                } animate-fade-in`}
-              >
-                {m.content}
-              </div>
-            )}
+            {/* Render text parts */}
+            {m.parts
+              .filter((part) => part.type === "text" && part.text.trim().length > 0)
+              .map((part, i) => (
+                <div
+                  key={`text-${i}`}
+                  className={`${styles.messageBubble} ${
+                    m.role === "user"
+                      ? styles.messageBubbleUser
+                      : styles.messageBubbleAgent
+                  } animate-fade-in`}
+                >
+                  {part.type === "text" ? part.text : ""}
+                </div>
+              ))}
 
             {/* Display tool invocations */}
-            {m.toolInvocations?.map((toolInvocation) => {
-              const hasResult = toolInvocation.state === "result";
-              const resultData = hasResult ? toolInvocation.result : null;
-              const products = hasResult ? extractProducts(resultData) : null;
+            {m.parts
+              .filter((part) => part.type === "tool-invocation")
+              .map((part) => {
+                if (part.type !== "tool-invocation") return null;
+                const toolInvocation = part.toolInvocation;
+                const hasResult = toolInvocation.state === "result";
+                const resultData = hasResult ? toolInvocation.result : null;
+                const products = hasResult ? extractProducts(resultData) : null;
 
-              return (
-                <div key={toolInvocation.toolCallId}>
-                  <div className={styles.toolBlock}>
-                    {hasResult ? "✓" : "⏳"}{" "}
-                    <strong>{toolInvocation.toolName}</strong>
-                    {!hasResult && " — working…"}
+                return (
+                  <div key={toolInvocation.toolCallId}>
+                    <div className={styles.toolBlock}>
+                      {hasResult ? "✓" : "⏳"}{" "}
+                      <strong>{toolInvocation.toolName}</strong>
+                      {!hasResult && " — working…"}
+                    </div>
+                    {products && products.length > 0 && (
+                      <ProductCarousel products={products} />
+                    )}
                   </div>
-                  {products && products.length > 0 && (
-                    <ProductCarousel products={products} />
-                  )}
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         ))}
 
@@ -141,7 +159,7 @@ export default function Chat() {
             className={styles.inputField}
             value={input}
             placeholder="Message Kapruka…"
-            onChange={handleInputChange}
+            onChange={(e) => setInput(e.target.value)}
             disabled={isLoading}
           />
         </div>
