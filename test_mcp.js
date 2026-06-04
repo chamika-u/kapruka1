@@ -14,7 +14,7 @@ async function run() {
   try {
     const res = await client.callTool({
       name: "kapruka_search_products",
-      arguments: { params: { q: "cakes", limit: 3 } }
+      arguments: { params: { q: "chocolate", limit: 3 } }
     });
     console.log("Tool result:", JSON.stringify(res, null, 2));
   } catch (e) {
