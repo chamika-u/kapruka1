@@ -1,8 +1,11 @@
 const { Client } = require("@modelcontextprotocol/sdk/client/index.js");
-const { SSEClientTransport } = require("@modelcontextprotocol/sdk/client/sse.js");
+const { StdioClientTransport } = require("@modelcontextprotocol/sdk/client/stdio.js");
 
 async function run() {
-  const transport = new SSEClientTransport(new URL("https://mcp.kapruka.com/mcp"));
+  const transport = new StdioClientTransport({
+    command: "npx",
+    args: ["-y", "mcp-remote", "https://mcp.kapruka.com/mcp"]
+  });
   const client = new Client({ name: "test", version: "1.0.0" }, { capabilities: {} });
   await client.connect(transport);
   const tools = await client.listTools();
