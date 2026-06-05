@@ -108,7 +108,7 @@
   padding: 0 4px;
   line-height: 1;
   animation: popIn var(--duration-fast) var(--spring) forwards;
-  box-shadow: 0 1px 4px rgba(94, 23, 235, 0.4);
+  box-shadow: 0 1px 4px rgba(64, 41, 112, 0.4);
 }
 
 /* ── Account & User Button ── */
@@ -224,12 +224,12 @@
   width: 80px;
   height: 80px;
   border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, var(--accent), #FFC107);
+  background: linear-gradient(135deg, var(--accent), #fbdb04);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  box-shadow: 0 8px 32px rgba(94, 23, 235, 0.3);
+  box-shadow: 0 8px 32px rgba(64, 41, 112, 0.3);
 }
 
 .welcomeTitle {

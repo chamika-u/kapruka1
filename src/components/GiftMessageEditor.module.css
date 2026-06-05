@@ -87,7 +87,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--accent), #FFC107, #FFD54F);
+  background: linear-gradient(90deg, var(--accent), #fbdb04, #f8da08);
 }
 
 .previewIcon {

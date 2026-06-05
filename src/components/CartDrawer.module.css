@@ -342,13 +342,13 @@
   letter-spacing: -0.01em;
   text-align: center;
   transition: all var(--duration-fast) var(--ease-apple);
-  box-shadow: 0 4px 16px rgba(94, 23, 235, 0.3);
+  box-shadow: 0 4px 16px rgba(64, 41, 112, 0.3);
 }
 
 .checkoutBtn:hover {
   background: var(--accent-hover);
   transform: scale(1.01);
-  box-shadow: 0 6px 24px rgba(94, 23, 235, 0.35);
+  box-shadow: 0 6px 24px rgba(64, 41, 112, 0.35);
 }
 
 .checkoutBtn:active {
