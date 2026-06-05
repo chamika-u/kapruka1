@@ -43,8 +43,8 @@ const extractProducts = (result: any) => {
           name: nameMatch[1].trim(),
           price: priceMatch ? priceMatch[1].trim() : "",
           url: urlMatch ? urlMatch[1].trim() : "",
-          // Use a placeholder Kapruka image based on ID or leave blank if we can't reliably guess
-          image: urlMatch ? `https://www.kapruka.com/cdn-cgi/image/width=450,quality=95,f=auto/buyonline/items/large/${idMatch[1].trim()}.jpg` : "",
+          // Use our Next.js API route to reliably scrape the og:image from the Kapruka product page
+          image: urlMatch ? `/api/product-image?url=${encodeURIComponent(urlMatch[1].trim())}` : "",
         });
       }
     }
