@@ -224,11 +224,11 @@
   width: 80px;
   height: 80px;
   border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, var(--accent), #fbdb04);
+  background: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: #fbdb04;
   box-shadow: 0 8px 32px rgba(64, 41, 112, 0.3);
 }
 
