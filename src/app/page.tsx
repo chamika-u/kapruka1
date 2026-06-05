@@ -2,7 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { useState, useEffect, useRef, useCallback, FormEvent } from "react";
-import { ArrowUp, ShoppingBag, Globe, AlertCircle, X } from "lucide-react";
+import { ArrowUp, ShoppingBag, Globe, AlertCircle, X, Square } from "lucide-react";
 import { ProductCarousel } from "@/components/ProductCard";
 import { CartDrawer } from "@/components/CartDrawer";
 import { useCart, CartItem } from "@/lib/CartContext";
@@ -57,7 +57,7 @@ const extractProducts = (result: any) => {
 };
 
 export default function Chat() {
-  const { messages, sendMessage, status, error } = useChat();
+  const { messages, sendMessage, stop, status, error } = useChat();
   const [input, setInput] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [cartOpen, setCartOpen] = useState(false);
@@ -269,14 +269,25 @@ export default function Chat() {
             disabled={isLoading}
           />
         </div>
-        <button
-          type="submit"
-          className={styles.sendButton}
-          disabled={isLoading || !input.trim()}
-          aria-label="Send message"
-        >
-          <ArrowUp size={20} strokeWidth={2.5} />
-        </button>
+        {isLoading ? (
+          <button
+            type="button"
+            className={`${styles.sendButton} ${styles.stopButton}`}
+            onClick={stop}
+            aria-label="Stop generating"
+          >
+            <Square size={16} strokeWidth={3} fill="currentColor" />
+          </button>
+        ) : (
+          <button
+            type="submit"
+            className={styles.sendButton}
+            disabled={!input.trim()}
+            aria-label="Send message"
+          >
+            <ArrowUp size={20} strokeWidth={2.5} />
+          </button>
+        )}
       </form>
 
       {/* ── Cart Drawer ── */}

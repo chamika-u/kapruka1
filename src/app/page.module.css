@@ -316,6 +316,20 @@
   box-shadow: none;
 }
 
+.stopButton {
+  background: var(--label-secondary);
+}
+
+.stopButton:hover {
+  background: var(--label-primary);
+  transform: scale(1.06);
+}
+
+.stopButton:active {
+  transform: scale(0.94);
+  background: var(--label-primary);
+}
+
 /* ── Typing Indicator (Apple-style bouncing dots) ── */
 .loadingIndicator {
   display: flex;
