@@ -1,5 +1,5 @@
 import { streamText, jsonSchema, stepCountIs, convertToModelMessages } from "ai";
-import { google } from "@ai-sdk/google";
+import { ollama } from "ollama-ai-provider";
 import { getMcpClient } from "@/lib/mcp";
 import type { Tool } from "ai";
 
@@ -97,7 +97,7 @@ Users may mix languages (e.g., "මට birthday cake එකක් ඕන" or "ca
     const modelMessages = await convertToModelMessages(messages, { tools: aiTools });
 
     const result = streamText({
-      model: google("gemini-2.5-flash"),
+      model: ollama("sinllama"),
       system: systemPrompt,
       messages: modelMessages,
       tools: aiTools,
