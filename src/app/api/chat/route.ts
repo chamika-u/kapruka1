@@ -2,11 +2,23 @@ import { streamText, jsonSchema, stepCountIs, convertToModelMessages } from "ai"
 import { google } from "@ai-sdk/google";
 import { getMcpClient } from "@/lib/mcp";
 import type { Tool } from "ai";
+import { rateLimit } from "@/lib/rate-limiter";
+import { trackOrder, checkDeliveryAvailability } from "@/lib/kapruka-api";
 
 export const maxDuration = 60; // Allow long executions for multi-step AI
 
 export async function POST(req: Request) {
   try {
+    // 1. Apply API Rate Limiting for Abuse Prevention
+    const ip = req.headers.get("x-forwarded-for") || "127.0.0.1";
+    const { success, reset } = rateLimit(ip, 20, 60000); // 20 reqs / min
+    if (!success) {
+      return new Response(
+        JSON.stringify({ error: `Rate limit reached. Please try again after ${new Date(reset).toLocaleTimeString()}` }),
+        { status: 429, headers: { "Content-Type": "application/json", "Retry-After": "60" } }
+      );
+    }
+
     const { messages } = await req.json();
     const mcp = await getMcpClient();
     const mcpToolsResult = await mcp.listTools();
@@ -36,6 +48,36 @@ export async function POST(req: Request) {
         },
       };
     }
+
+    // 2. Inject Local Kapruka Ecosystem Tools
+    aiTools["track_order"] = {
+      description: "Track a user's Kapruka order using their order ID. Returns the current status and estimated delivery date.",
+      parameters: jsonSchema({
+        type: "object",
+        properties: {
+          orderId: { type: "string", description: "The ID of the order to track" }
+        },
+        required: ["orderId"]
+      } as any),
+      execute: async ({ orderId }) => {
+        return await trackOrder(orderId as string);
+      }
+    };
+
+    aiTools["check_delivery_availability"] = {
+      description: "Check if delivery is available for a specific location and date in Sri Lanka.",
+      parameters: jsonSchema({
+        type: "object",
+        properties: {
+          location: { type: "string", description: "The city or region" },
+          date: { type: "string", description: "The requested delivery date (YYYY-MM-DD)" }
+        },
+        required: ["location", "date"]
+      } as any),
+      execute: async ({ location, date }) => {
+        return await checkDeliveryAvailability(date as string, location as string);
+      }
+    };
 
     const systemPrompt = `You are a helpful, witty, and warm AI shopping assistant for Kapruka (කප්රුක) — Sri Lanka's premier e-commerce platform.
 Your goal is to help users discover products, answer questions, and seamlessly guide them to add items to their cart and checkout.
