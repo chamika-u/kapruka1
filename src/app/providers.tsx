@@ -2,6 +2,7 @@
 
 import { CartProvider } from "@/lib/CartContext";
 import { I18nProvider } from "@/lib/i18n";
+import { AuthProvider } from "@/lib/AuthContext";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
