@@ -118,13 +118,13 @@
   gap: 8px;
   margin-top: 8px;
   transition: all var(--duration-fast) var(--ease-apple);
-  box-shadow: 0 4px 16px rgba(0, 163, 79, 0.3);
+  box-shadow: 0 4px 16px rgba(94, 23, 235, 0.3);
 }
 
 .submitBtn:hover:not(:disabled) {
   background: var(--accent-hover);
   transform: scale(1.02);
-  box-shadow: 0 6px 20px rgba(0, 163, 79, 0.4);
+  box-shadow: 0 6px 20px rgba(94, 23, 235, 0.4);
 }
 
 .submitBtn:active:not(:disabled) {

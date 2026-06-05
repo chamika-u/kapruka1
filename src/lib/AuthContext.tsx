@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       id: Math.random().toString(36).substring(2, 9),
       name,
       email,
-      avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00A34F&color=fff`,
+      avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=5E17EB&color=fff`,
     };
     
     setUser(newUser);
