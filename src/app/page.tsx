@@ -2,11 +2,13 @@
 
 import { useChat } from "@ai-sdk/react";
 import { useState, useEffect, useRef, useCallback, FormEvent } from "react";
-import { ArrowUp, ShoppingBag, Globe, AlertCircle, X, Square } from "lucide-react";
+import { ArrowUp, ShoppingBag, Globe, AlertCircle, X, Square, User, LogOut } from "lucide-react";
 import { ProductCarousel } from "@/components/ProductCard";
 import { CartDrawer } from "@/components/CartDrawer";
 import { useCart, CartItem } from "@/lib/CartContext";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/lib/AuthContext";
+import { LoginModal } from "@/components/LoginModal";
 import styles from "./page.module.css";
 
 // Helper to safely extract products from a tool result (parses Kapruka Markdown)
@@ -61,9 +63,12 @@ export default function Chat() {
   const [input, setInput] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [cartOpen, setCartOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [errorDismissed, setErrorDismissed] = useState(false);
   const { cartCount, cart } = useCart();
   const { t, locale, setLocale } = useI18n();
+  const { user, logout } = useAuth();
 
   const isLoading = status === "streaming" || status === "submitted";
 
@@ -142,6 +147,48 @@ export default function Chat() {
           <span>{t("header.brand")}</span>
         </div>
         <div className={styles.headerRight}>
+          {user ? (
+            <div className={styles.userMenuContainer}>
+              <button 
+                className={styles.userButton}
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                aria-label="User menu"
+              >
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt={user.name} className={styles.userAvatar} />
+                ) : (
+                  <User size={20} />
+                )}
+              </button>
+              {userMenuOpen && (
+                <div className={styles.userDropdown}>
+                  <div className={styles.userInfo}>
+                    <strong>{user.name}</strong>
+                    <span>{user.email}</span>
+                  </div>
+                  <button 
+                    className={styles.logoutBtn}
+                    onClick={() => {
+                      logout();
+                      setUserMenuOpen(false);
+                    }}
+                  >
+                    <LogOut size={14} />
+                    Log out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              className={styles.accountButton}
+              onClick={() => setLoginOpen(true)}
+              aria-label="Log in"
+            >
+              <User size={20} />
+            </button>
+          )}
+
           <button
             className={styles.cartButton}
             onClick={() => setCartOpen(true)}
@@ -296,6 +343,9 @@ export default function Chat() {
         onClose={() => setCartOpen(false)}
         onCheckout={handleCheckout}
       />
+
+      {/* ── Login Modal ── */}
+      <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
     </main>
   );
 }

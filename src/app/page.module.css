@@ -111,6 +111,88 @@
   box-shadow: 0 1px 4px rgba(0, 163, 79, 0.4);
 }
 
+/* ── Account & User Button ── */
+.accountButton,
+.userButton {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--label-primary);
+  transition: all var(--duration-fast) var(--ease-apple);
+}
+
+.accountButton:hover,
+.userButton:hover {
+  background: var(--bg-grouped);
+}
+
+.userAvatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--separator);
+}
+
+.userMenuContainer {
+  position: relative;
+}
+
+.userDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--material-thick);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 0.5px solid var(--separator);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 8px;
+  min-width: 180px;
+  z-index: 50;
+  animation: popIn var(--duration-fast) var(--spring) forwards;
+}
+
+.userInfo {
+  padding: 8px 12px;
+  border-bottom: 0.5px solid var(--separator);
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.userInfo strong {
+  font-size: 14px;
+  color: var(--label-primary);
+}
+
+.userInfo span {
+  font-size: 12px;
+  color: var(--label-secondary);
+}
+
+.logoutBtn {
+  width: 100%;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--system-red);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) var(--ease-apple);
+}
+
+.logoutBtn:hover {
+  background: rgba(255, 59, 48, 0.1);
+}
+
 /* ── Chat Messages Area ── */
 .chatContainer {
   flex: 1;
