@@ -20,6 +20,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
   const { addToCart, isInCart } = useCart();
   const { t } = useI18n();
   const [justAdded, setJustAdded] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const inCart = product.id ? isInCart(product.id) : false;
 
@@ -48,8 +49,13 @@ export const ProductCard = ({ product }: { product: Product }) => {
 
   return (
     <div className={styles.card} onClick={() => product.url && window.open(product.url, '_blank')}>
-      {product.image && (
-        <img src={product.image} alt={product.name} className={styles.image} />
+      {product.image && !imgError && (
+        <img 
+          src={product.image} 
+          alt={product.name} 
+          className={styles.image} 
+          onError={() => setImgError(true)} 
+        />
       )}
       <div className={styles.content}>
         <h3 className={styles.name}>{product.name || 'Unnamed Product'}</h3>
