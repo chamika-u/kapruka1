@@ -25,10 +25,10 @@
   --tint-hover: #0077ed;
   --tint-active: #006edb;
 
-  /* Kapruka accent — warm orange for brand identity */
-  --accent: #ff6723;
-  --accent-hover: #e85a1b;
-  --accent-soft: rgba(255, 103, 35, 0.1);
+  /* Kapruka accent — green for brand identity */
+  --accent: #00A34F;
+  --accent-hover: #008f45;
+  --accent-soft: rgba(0, 163, 79, 0.1);
 
   --system-green: #34c759;
   --system-red: #ff3b30;
