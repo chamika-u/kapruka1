@@ -68,9 +68,18 @@ export default function Chat() {
   const [errorDismissed, setErrorDismissed] = useState(false);
   const { cartCount, cart } = useCart();
   const { t, locale, setLocale } = useI18n();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading: isAuthLoading } = useAuth();
+  const [hasPromptedLogin, setHasPromptedLogin] = useState(false);
 
   const isLoading = status === "streaming" || status === "submitted";
+
+  // Pop up login form if user is not logged in when page loads
+  useEffect(() => {
+    if (!isAuthLoading && !user && !hasPromptedLogin) {
+      setLoginOpen(true);
+      setHasPromptedLogin(true);
+    }
+  }, [isAuthLoading, user, hasPromptedLogin]);
 
   // Reset dismiss when a new error appears
   useEffect(() => {
